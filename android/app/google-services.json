@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "973553465684",
+    "project_id": "puppet-vendors",
+    "storage_bucket": "puppet-vendors.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:973553465684:android:8d029bdec2d0d84bcd70c1",
+        "android_client_info": {
+          "package_name": "com.example.puppetvendors_mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "973553465684-ktj7o570f7saeluig8kl4nrragie6r1i.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBdFUshEMf9os9OLxlCl_3ezBcqN5UayWA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "973553465684-ktj7o570f7saeluig8kl4nrragie6r1i.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
