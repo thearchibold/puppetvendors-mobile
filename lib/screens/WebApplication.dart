@@ -20,11 +20,11 @@ class _WebApplication extends State<WebApplication> {
       top: true,
       right: false,
       bottom: false,
-      child: WebviewScaffold(
-        url: selectedUrl,
-        withZoom: false,
-        withLocalStorage: true,
-        clearCookies: false,
+      child: WebView(
+        initialUrl: selectedUrl,
+        //withZoom: false,
+        //withLocalStorage: true,
+        //clearCookies: false,
       ),
     );
   }
