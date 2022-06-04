@@ -98,10 +98,10 @@ class Navigation extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return MaterialApp(
-      initialRoute: '/auth',
+      initialRoute: '/splash',
       routes: {
-        '/auth': (context) =>  const AuthApp(),
         '/splash': (context) => const SplashScreen(),
+        '/auth': (context) =>  const AuthApp(),
         '/app': (context) => const WebApplication()
       }
     );
