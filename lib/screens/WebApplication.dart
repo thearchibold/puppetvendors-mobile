@@ -9,6 +9,8 @@ class WebApplication extends StatefulWidget {
 
   @override
   State<WebApplication> createState() => _WebApplication();
+
+  //<%=baseURL %>/shop/<%=shop._id %>/login
 }
 
 class _WebApplication extends State<WebApplication> {
@@ -22,6 +24,8 @@ class _WebApplication extends State<WebApplication> {
       bottom: false,
       child: WebView(
         initialUrl: selectedUrl,
+        javascriptMode: JavascriptMode.unrestricted,
+
         //withZoom: false,
         //withLocalStorage: true,
         //clearCookies: false,

@@ -2,7 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:puppetvendors_mobile/firebase_options.dart';
-import 'package:puppetvendors_mobile/screens/Auth.dart';
+import 'package:puppetvendors_mobile/screens/AuthApp.dart';
 import 'package:puppetvendors_mobile/screens/SplashScreen.dart';
 import 'package:puppetvendors_mobile/screens/WebApplication.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -100,7 +100,7 @@ class Navigation extends StatelessWidget{
     return MaterialApp(
       initialRoute: '/auth',
       routes: {
-        '/auth': (context) => const Auth(),
+        '/auth': (context) =>  const AuthApp(),
         '/splash': (context) => const SplashScreen(),
         '/app': (context) => const WebApplication()
       }
