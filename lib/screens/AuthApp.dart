@@ -2,8 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-
+import 'package:get_storage/get_storage.dart';
 import '../services/api_services.dart';
 
 class AuthApp extends StatefulWidget {
@@ -94,10 +93,10 @@ class _AuthAppState extends State<AuthApp> {
                   _loading = true;
                 });
                 try{
-                  var prefs = await SharedPreferences.getInstance();
                   var response = await authenticate(_shopNameEditingController.text, _pinEditingController.text);
-                  print("api response ${response['vendor']['commissionType']}");
-                  prefs.setString("data", jsonEncode(response));
+                  GetStorage().write("vendor_id", response['vendor']['_id']);
+                  GetStorage().write("shop_id", response['vendor']['shopId']);
+                  GetStorage().write("data", jsonEncode(response));
                   Navigator.pushNamed(context, "/splash");
                 }catch(e){
                   print(e);

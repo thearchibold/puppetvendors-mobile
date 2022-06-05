@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:flutter_webview_plugin/flutter_webview_plugin.dart';
+import 'package:get_storage/get_storage.dart';
 
 
 
@@ -9,27 +12,41 @@ class WebApplication extends StatefulWidget {
 
   @override
   State<WebApplication> createState() => _WebApplication();
-
-  //<%=baseURL %>/shop/<%=shop._id %>/login
 }
 
 class _WebApplication extends State<WebApplication> {
+
+  @override
+  void initState() {
+    super.initState();
+    // Enable virtual display.
+    if (Platform.isAndroid) WebView.platform = AndroidWebView();
+  }
+
+
   @override
   Widget build(BuildContext context) {
-    String selectedUrl = "https://app.puppetvendors.com/shopify/install?shop=lilydale-3.myshopify.com";
+    var vendorId = GetStorage().read("shop_id");
+    String selectedUrl = "https://app.puppetvendors.com/shop/$vendorId/login";
+    print(selectedUrl);
     return SafeArea(
       left: false,
       top: true,
       right: false,
       bottom: false,
-      child: WebView(
-        initialUrl: selectedUrl,
-        javascriptMode: JavascriptMode.unrestricted,
+      child: WebviewScaffold(
+        url: selectedUrl,
+        //javascriptMode: JavascriptMode.unrestricted,
 
-        //withZoom: false,
-        //withLocalStorage: true,
-        //clearCookies: false,
+        withZoom: false,
+        withLocalStorage: true,
+        clearCookies: false,
       ),
     );
   }
 }
+
+
+/*
+*
+* */

@@ -1,12 +1,12 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:puppetvendors_mobile/firebase_options.dart';
 import 'package:puppetvendors_mobile/screens/AuthApp.dart';
 import 'package:puppetvendors_mobile/screens/SplashScreen.dart';
 import 'package:puppetvendors_mobile/screens/WebApplication.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:get_storage/get_storage.dart';
+import '../services/api_services.dart';
 
 
 
@@ -37,9 +37,13 @@ void requestPermission() async {
 }
 
 
-void getFirebaseToken() {
+void getFirebaseToken()  {
+
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-  messaging.getToken().then((value) => print(value));
+  String vendorId = GetStorage().read('vendor_id');
+  messaging.getToken().then((value) => {
+    saveVendorToken(vendorId, value)
+  });
 }
 
 void listenNotifications() async {
@@ -81,13 +85,17 @@ void listenNotifications() async {
 }
 
 Future<void> main() async{
-
+  await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   requestPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessaginBackgroundHandler);
   getFirebaseToken();
   listenNotifications();
+
+  FirebaseMessaging.instance.onTokenRefresh.listen((event) {
+    getFirebaseToken();
+  });
 
   runApp(
     Navigation()
@@ -103,7 +111,8 @@ class Navigation extends StatelessWidget{
         '/splash': (context) => const SplashScreen(),
         '/auth': (context) =>  const AuthApp(),
         '/app': (context) => const WebApplication()
-      }
+      },
+      debugShowCheckedModeBanner: false,
     );
   }
 }
