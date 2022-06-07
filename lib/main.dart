@@ -38,11 +38,12 @@ void requestPermission() async {
 
 
 void getFirebaseToken()  {
-
   FirebaseMessaging messaging = FirebaseMessaging.instance;
-  String vendorId = GetStorage().read('vendor_id');
+  var vendorId = GetStorage().read('vendor_id');
   messaging.getToken().then((value) => {
-    saveVendorToken(vendorId, value)
+    if(vendorId != null){
+      saveVendorToken(vendorId, value)
+    }
   });
 }
 
@@ -90,7 +91,6 @@ Future<void> main() async{
   await Firebase.initializeApp();
   requestPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessaginBackgroundHandler);
-  getFirebaseToken();
   listenNotifications();
 
   FirebaseMessaging.instance.onTokenRefresh.listen((event) {

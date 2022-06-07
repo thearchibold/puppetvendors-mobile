@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 
-const BASE_URL = "https://7f7f-41-210-10-85.ngrok.io";
+const BASE_URL = "https://6360-41-210-10-64.ngrok.io";
 
 Future<Map<String, dynamic>> authenticate(var shopName, var pin) async {
   var headers = {'Content-Type': 'application/json'};
