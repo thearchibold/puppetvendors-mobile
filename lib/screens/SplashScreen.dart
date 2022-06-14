@@ -60,7 +60,7 @@ class _SplashScreen extends State<SplashScreen> {
 
       getFirebaseToken();
 
-      Timer(const Duration(seconds: 5), ()=>{
+      Timer(const Duration(seconds: 2), ()=>{
         Navigator.pushNamed(context, '/app')
       });
     }

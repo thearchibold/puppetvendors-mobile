@@ -1,3 +1,4 @@
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -7,6 +8,9 @@ import 'package:puppetvendors_mobile/screens/WebApplication.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get_storage/get_storage.dart';
 import '../services/api_services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'dart:io';
+
 
 
 
@@ -96,6 +100,12 @@ Future<void> main() async{
   FirebaseMessaging.instance.onTokenRefresh.listen((event) {
     getFirebaseToken();
   });
+
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
+
+  //FirebaseMessaging.onMessageOpenedApp();
 
   runApp(
     Navigation()
