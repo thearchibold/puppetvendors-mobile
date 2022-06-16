@@ -14,9 +14,15 @@ import 'dart:io';
 
 
 
-Future<void> _firebaseMessaginBackgroundHandler(RemoteMessage message) async {
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
   print('handling message $message');
+}
+
+
+Future<void> _firebaseMessagingNotificationClicked(RemoteMessage message) async {
+  print('handling message firebae notif click $message');
+
 }
 
 void requestPermission() async {
@@ -89,12 +95,15 @@ void listenNotifications() async {
   });
 }
 
+
 Future<void> main() async{
   await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
   requestPermission();
-  FirebaseMessaging.onBackgroundMessage(_firebaseMessaginBackgroundHandler);
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  FirebaseMessaging.onMessageOpenedApp.listen(_firebaseMessagingNotificationClicked);
+
   listenNotifications();
 
   FirebaseMessaging.instance.onTokenRefresh.listen((event) {

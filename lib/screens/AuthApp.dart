@@ -20,6 +20,9 @@ class _AuthAppState extends State<AuthApp> {
   final TextEditingController  _shopNameEditingController = TextEditingController();
   final TextEditingController _pinEditingController = TextEditingController();
 
+  void navigate(){
+    Navigator.pushNamed(context, "/splash");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -69,7 +72,7 @@ class _AuthAppState extends State<AuthApp> {
                 FilteringTextInputFormatter.allow(RegExp('[0-9]')),
               ],
               decoration: InputDecoration(
-                hintText: "Enter pin here",
+                hintText: "436594",
                 labelText: "6 digit PIN",
                 suffixIcon: IconButton(
                   icon: _secure ? const Icon(Icons.remove_red_eye) : const Icon(Icons.security),
@@ -96,8 +99,11 @@ class _AuthAppState extends State<AuthApp> {
                   var response = await authenticate(_shopNameEditingController.text, _pinEditingController.text);
                   GetStorage().write("vendor_id", response['vendor']['_id']);
                   GetStorage().write("shop_id", response['vendor']['shopId']);
-                  GetStorage().write("data", jsonEncode(response));
-                  Navigator.pushNamed(context, "/splash");
+                  GetStorage().write("shop_name", response['shop']['shopName']);
+                  GetStorage().write("vendor_name", response['vendor']['vendorName']);
+                  GetStorage().write("profile_banner", response['vendor']["profile"]["profileBanner"]);
+                  //GetStorage().write("data", jsonEncode(response));
+                  navigate();
                 }catch(e){
                   print(e);
                 }finally{

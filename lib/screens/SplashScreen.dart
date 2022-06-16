@@ -37,25 +37,21 @@ class _SplashScreen extends State<SplashScreen> {
 
 
   void checkLoggedIn() {
-    var storedData = GetStorage().read("data");
-    if (storedData == null) {
+    var vendorId = GetStorage().read("vendor_id");
+    if (vendorId == null) {
       Navigator.pushNamed(context, "/auth");
       return;
     }else{
 
-      Map<String, dynamic> userData = jsonDecode(storedData!);
-      Map<String, dynamic> vendor = userData['vendor'];
-      Map<String, dynamic> shop = userData["shop"];
+      var shopId = GetStorage().read("shop_id");
 
-      var vendorId = vendor['_id'];
-      GetStorage().write("vendor_id", vendorId);
-      GetStorage().write("shop_id", vendor['shopId']);
-
-      var profileBanner = vendor["profile"]["profileBanner"];
+      var vendorId = GetStorage().read("vendor_id");
+      var vendorName = GetStorage().read("vendor_name");
+      var profileBanner = GetStorage().read("profile_banner");
       setState(() {
         splash_background = profileBanner;
-        _shop = shop != null ? shop['shopName'] : '';
-        _vendor = vendor != null ? vendor['vendorName'] : '';
+        _shop = shopId ?? '';
+        _vendor = vendorName ?? '';
       });
 
       getFirebaseToken();
