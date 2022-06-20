@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -12,17 +14,19 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'dart:io';
 
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  await Firebase.initializeApp();
   print('handling message $message');
 }
 
 
 Future<void> _firebaseMessagingNotificationClicked(RemoteMessage message) async {
-  print('handling message firebae notif click $message');
-
+  print('handling message firebae notif click ${message.notification} ${message.data}');
+  GetStorage().write("has_notif", jsonEncode(message.data));
+  navigatorKey.currentState?.pushNamed("/app");
 }
 
 void requestPermission() async {
@@ -97,6 +101,7 @@ void listenNotifications() async {
 
 
 Future<void> main() async{
+
   await GetStorage.init();
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -114,8 +119,6 @@ Future<void> main() async{
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 
-  //FirebaseMessaging.onMessageOpenedApp();
-
   runApp(
     Navigation()
   );
@@ -132,6 +135,7 @@ class Navigation extends StatelessWidget{
         '/app': (context) => const WebApplication()
       },
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigatorKey,
     );
   }
 }

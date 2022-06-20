@@ -77,7 +77,7 @@ class _SplashScreen extends State<SplashScreen> {
                       width: 100,
                       fit: BoxFit.cover,
                     ),
-                  Text(_shop != null ? _shop : '')
+                  Text(_vendor != null ? _vendor : '')
                 ],
               ),
             )));
