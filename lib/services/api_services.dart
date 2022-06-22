@@ -1,7 +1,11 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:platform_device_id/platform_device_id.dart';
+
 
 const BASE_URL = "https://1719-197-251-182-126.ngrok.io";
+
+
 
 Future<Map<String, dynamic>> authenticate(var shopName, var pin) async {
   var headers = {'Content-Type': 'application/json'};
@@ -24,14 +28,19 @@ Future<Map<String, dynamic>> authenticate(var shopName, var pin) async {
 }
 
 void saveVendorToken(var vendorId, var token) async {
-  print("Saving token for $vendorId $token");
+
+  var deviceId = await PlatformDeviceId.getDeviceId;
+  print("Saving token for (vendor=$vendorId) (device=$deviceId) (token=$token)");
+
+
   var headers = {
     'Content-Type': 'application/json',
   };
   var request = http.Request('POST', Uri.parse('$BASE_URL/api/v1/mobile/save-vendor-token'));
   request.body = json.encode({
     "vendorId": vendorId,
-    "token": token
+    "token": token,
+    "deviceId": deviceId
   });
   request.headers.addAll(headers);
 

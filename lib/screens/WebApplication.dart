@@ -106,7 +106,7 @@ class _WebApplication extends State<WebApplication> {
                     webView?.loadUrl(
                         urlRequest: URLRequest(
                             url: Uri.parse(
-                                "https://app.puppetvendors.com/portal/order/")));
+                                "https://app.puppetvendors.com/portal/order/$orderId?vendorId=${GetStorage().read("vendor_id")}")));
                     GetStorage().remove("has_notif");
                   }
                 }
