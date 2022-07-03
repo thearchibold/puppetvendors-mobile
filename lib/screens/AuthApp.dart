@@ -33,29 +33,17 @@ class _AuthAppState extends State<AuthApp> {
             child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
-                Text(
-                  "Puppet Vendors",
-                  style: TextStyle(
-                      fontSize: 26,
-                      color: Color.fromRGBO(0, 0, 0, 1),
-                      fontWeight: FontWeight.bold,
-                      wordSpacing: 2,
-                      letterSpacing: 1.2),
-                )
-              ],
-            ),
             const Padding(
-                padding: EdgeInsets.only(top: 20, bottom: 10),
+                padding: EdgeInsets.only(top: 20, bottom: 30),
                 child: Text(
                   "Enter Shop name and 6 digit pin from Web Admin Dashboard to Authenticate",
                   style: TextStyle(
                     color: Colors.black45,
                     fontWeight: FontWeight.w500,
                   ),
-                )),
+                  textAlign: TextAlign.center,
+                ),
+            ),
             TextField(
               controller: _shopNameEditingController,
               decoration: const InputDecoration(

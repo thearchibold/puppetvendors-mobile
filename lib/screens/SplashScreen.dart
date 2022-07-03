@@ -68,7 +68,10 @@ class _SplashScreen extends State<SplashScreen> {
         body: Padding(
             padding: const EdgeInsets.all(20),
             child: Center(
+
               child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (splash_background != null)
                     Image.network(
@@ -77,7 +80,11 @@ class _SplashScreen extends State<SplashScreen> {
                       width: 100,
                       fit: BoxFit.cover,
                     ),
-                  Text(_vendor != null ? _vendor : '')
+                  Text(_vendor != null ? _vendor : '', style: TextStyle(
+                    fontWeight: FontWeight.w900,
+                    letterSpacing: 1,
+                    fontSize: 20
+                  ),)
                 ],
               ),
             )));
