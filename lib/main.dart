@@ -5,7 +5,6 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:puppetvendors_mobile/screens/AuthApp.dart';
-import 'package:puppetvendors_mobile/screens/SplashScreen.dart';
 import 'package:puppetvendors_mobile/screens/WebApplication.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get_storage/get_storage.dart';
@@ -19,6 +18,7 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
   print('handling message $message');
 }
 
@@ -78,61 +78,74 @@ void listenNotifications() async {
   );
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+    print("New push message is in");
     RemoteNotification? notification = message.notification;
     AndroidNotification? android = notification?.android;
     AppleNotification? apple = notification?.apple;
 
-    if(notification!= null  && android != null){
-      flutterLocalNotificationsPlugin.show(
-        notification.hashCode,
-        notification.title,
-        notification.body,
-        NotificationDetails(
-          android: AndroidNotificationDetails(
-            channel.id,
-            channel.name,
-            icon: 'launch_background'
-          )
-        )
-      );
+    if(notification!= null){
+      if(Platform.isAndroid && android != null){
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            NotificationDetails(
+                android: AndroidNotificationDetails(
+                    channel.id,
+                    channel.name,
+                    icon: 'launch_background'
+                )
+            )
+        );
+      }
+      if(Platform.isIOS && apple != null){
+        flutterLocalNotificationsPlugin.show(
+            notification.hashCode,
+            notification.title,
+            notification.body,
+            const NotificationDetails(
+                iOS: IOSNotificationDetails(
+
+                )
+            )
+        );
+      }
     }
   });
 }
 
 
 Future<void> main() async{
+  WidgetsFlutterBinding.ensureInitialized();
 
   await GetStorage.init();
-  WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+
+  FirebaseMessaging.instance.getInitialMessage();
+
   requestPermission();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   FirebaseMessaging.onMessageOpenedApp.listen(_firebaseMessagingNotificationClicked);
 
   listenNotifications();
 
-  FirebaseMessaging.instance.onTokenRefresh.listen((event) {
-    getFirebaseToken();
-  });
 
-  if (Platform.isAndroid) {
-    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
-  }
 
   runApp(
-    Navigation()
+      Navigation()
   );
+
+
 }
 
 class Navigation extends StatelessWidget{
   @override
   Widget build(BuildContext context){
     return MaterialApp(
-      initialRoute: '/splash',
+      initialRoute:GetStorage().read('vendor_id') == null ? '/auth' : '/app',
       routes: {
-        '/splash': (context) => const SplashScreen(),
-        '/auth': (context) =>  const AuthApp(),
-        '/app': (context) => const WebApplication()
+        '/app': (context) => const WebApplication(),
+        '/auth': (context) =>  const AuthApp()
       },
       debugShowCheckedModeBanner: false,
       navigatorKey: navigatorKey,

@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:puppetvendors_mobile/main.dart';
 import '../services/api_services.dart';
 
 class AuthApp extends StatefulWidget {
@@ -21,7 +22,11 @@ class _AuthAppState extends State<AuthApp> {
   final TextEditingController _pinEditingController = TextEditingController();
 
   void navigate(){
-    Navigator.pushNamed(context, "/splash");
+    navigatorKey.currentState?.pushNamed("/app");
+  }
+
+  void showMessage(var message){
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -78,7 +83,17 @@ class _AuthAppState extends State<AuthApp> {
               maxLength: 6,
             ),
             ElevatedButton(
+              
               onPressed: () async {
+                if(_shopNameEditingController.text == ""){
+                  showMessage("Please enter Shop name");
+                  return;
+                }
+
+                if(_pinEditingController.text == ""){
+                  showMessage("Please enter PIN");
+                  return;
+                }
                 // Navigate back to first screen when tapped.
                 setState((){
                   _loading = true;
@@ -93,15 +108,18 @@ class _AuthAppState extends State<AuthApp> {
                   //GetStorage().write("data", jsonEncode(response));
                   navigate();
                 }catch(e){
-                  print(e);
+                  showMessage(e.toString());
+                  print(e.toString());
                 }finally{
                   setState((){
                     _loading = false;
                   });
                 }
               },
-              child: _loading ? CircularProgressIndicator(color: Colors.white,) : Text('Authenticate !'),
-              style: ElevatedButton.styleFrom(fixedSize: const Size(300, 50)),
+              style: ElevatedButton.styleFrom(
+                  primary: const Color.fromRGBO(24, 92, 238, 1),
+                  fixedSize: const Size(300, 50)),
+              child: _loading ? const CircularProgressIndicator(color: Colors.white,) : const Text('Authenticate'),
 
             ),
           ],

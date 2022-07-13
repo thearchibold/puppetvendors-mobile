@@ -9,7 +9,7 @@ var base_url = AppConstants.APP_URL;
 
 
 
-Future<Map<String, dynamic>> authenticate(var shopName, var pin) async {
+Future authenticate(var shopName, var pin) async {
   var headers = {'Content-Type': 'application/json'};
   var request = http.Request(
       'POST',
@@ -24,7 +24,6 @@ Future<Map<String, dynamic>> authenticate(var shopName, var pin) async {
     var resp = await response.stream.bytesToString();
     return jsonDecode(resp);
   } else {
-    print(response.reasonPhrase);
     throw Exception(response.reasonPhrase);
   }
 }

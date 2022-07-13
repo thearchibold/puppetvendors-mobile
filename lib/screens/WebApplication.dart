@@ -2,11 +2,15 @@ import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:puppetvendors_mobile/main.dart';
 import 'package:puppetvendors_mobile/services/constants.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_storage/get_storage.dart';
+
+import '../services/api_services.dart';
 
 class WebApplication extends StatefulWidget {
   const WebApplication({Key? key}) : super(key: key);
@@ -17,6 +21,7 @@ class WebApplication extends StatefulWidget {
 
 class _WebApplication extends State<WebApplication> {
   InAppWebViewController? webView;
+  var vendorId = GetStorage().read('vendor_id');
 
   String pageUrl = "";
   String email = '';
@@ -27,8 +32,26 @@ class _WebApplication extends State<WebApplication> {
   void initState() {
     super.initState();
     WidgetsFlutterBinding.ensureInitialized();
-    initStorage();
+    checkLoggedIn();
+    listenNotifications();
   }
+
+  void getFirebaseToken()  {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+    messaging.getToken().then((value) => {
+      if(vendorId != null){
+        saveVendorToken(vendorId, value)
+      }
+    });
+  }
+
+  void checkLoggedIn() {
+    if (vendorId != null) {
+      initStorage();
+      getFirebaseToken();
+    }
+  }
+
 
   void initStorage() async {
     final prefs = await SharedPreferences.getInstance();
@@ -114,7 +137,7 @@ class _WebApplication extends State<WebApplication> {
                     webView?.loadUrl(
                         urlRequest: URLRequest(
                             url: Uri.parse(
-                                "${AppConstants.APP_URL}/portal/order/$orderId?vendorId=${GetStorage().read("vendor_id")}")));
+                                "${AppConstants.APP_URL}/portal/order/$orderId?vendorId=$vendorId")));
                     GetStorage().remove("has_notif");
                   }
                 }
