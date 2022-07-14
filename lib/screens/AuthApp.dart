@@ -80,18 +80,16 @@ class _AuthAppState extends State<AuthApp> {
               obscureText: _secure,
               style: const TextStyle(fontSize: 16),
               keyboardType: TextInputType.number,
-              maxLength: 6,
+              maxLength: 6
             ),
             ElevatedButton(
-              
               onPressed: () async {
                 if(_shopNameEditingController.text == ""){
                   showMessage("Please enter Shop name");
                   return;
                 }
-
-                if(_pinEditingController.text == ""){
-                  showMessage("Please enter PIN");
+                if(_pinEditingController.text.length < 6){
+                  showMessage("Please enter a valid PIN");
                   return;
                 }
                 // Navigate back to first screen when tapped.
@@ -102,14 +100,10 @@ class _AuthAppState extends State<AuthApp> {
                   var response = await authenticate(_shopNameEditingController.text, _pinEditingController.text);
                   GetStorage().write("vendor_id", response['vendor']['_id']);
                   GetStorage().write("shop_id", response['vendor']['shopId']);
-                  GetStorage().write("shop_name", response['shop']['shopName']);
-                  GetStorage().write("vendor_name", response['vendor']['vendorName']);
-                  GetStorage().write("profile_banner", response['vendor']["profile"]["profileBanner"]);
                   //GetStorage().write("data", jsonEncode(response));
                   navigate();
                 }catch(e){
                   showMessage(e.toString());
-                  print(e.toString());
                 }finally{
                   setState((){
                     _loading = false;

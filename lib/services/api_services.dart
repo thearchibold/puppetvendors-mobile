@@ -15,7 +15,7 @@ Future authenticate(var shopName, var pin) async {
       'POST',
       Uri.parse(
           '$base_url/api/v1/mobile/authenticate-vendor-pin'));
-  request.body = json.encode({"authPin": pin, "shopName": shopName});
+  request.body = json.encode({"authPin": pin, "shopDomain": "$shopName.myshopify.com"});
   request.headers.addAll(headers);
 
   http.StreamedResponse response = await request.send();

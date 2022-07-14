@@ -74,7 +74,7 @@ void listenNotifications() async {
   await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
     alert: true,
     badge: true,
-    sound: true
+    sound: false
   );
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -110,6 +110,7 @@ void listenNotifications() async {
             )
         );
       }
+      GetStorage().write("has_notif", jsonEncode(message.data));
     }
   });
 }
