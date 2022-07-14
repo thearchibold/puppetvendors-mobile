@@ -9,12 +9,22 @@ import 'package:puppetvendors_mobile/screens/WebApplication.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:get_storage/get_storage.dart';
 import '../services/api_services.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'dart:io';
 
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
+
+FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+AndroidNotificationChannel channel = const AndroidNotificationChannel(
+    'puppet_vendor_notif_channel_one',
+    'Puppet Vendor Notification',
+    importance: Importance.high);
+AndroidInitializationSettings initializationSettingsAndroid = const AndroidInitializationSettings('launch_background');
+
+IOSInitializationSettings initializationSettingsIOs = const IOSInitializationSettings();
+
+var initSetttings = InitializationSettings(android: initializationSettingsAndroid, iOS: initializationSettingsIOs);
 
 
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
@@ -61,21 +71,10 @@ void getFirebaseToken()  {
   });
 }
 
-void listenNotifications() async {
-  late AndroidNotificationChannel channel = const AndroidNotificationChannel(
-      'puppet_vendor_notif_channel_one',
-      'Puppet Vendor Notification',
-      importance: Importance.high);
 
-  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+void listenNotifications() async {
 
   await flutterLocalNotificationsPlugin.resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()?.createNotificationChannel(channel);
-
-  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
-    alert: true,
-    badge: true,
-    sound: false
-  );
 
   FirebaseMessaging.onMessage.listen((RemoteMessage message) {
     print("New push message is in");
@@ -110,6 +109,7 @@ void listenNotifications() async {
             )
         );
       }
+
       GetStorage().write("has_notif", jsonEncode(message.data));
     }
   });
@@ -125,12 +125,16 @@ Future<void> main() async{
   FirebaseMessaging.instance.getInitialMessage();
 
   requestPermission();
+  listenNotifications();
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+
   FirebaseMessaging.onMessageOpenedApp.listen(_firebaseMessagingNotificationClicked);
 
-  listenNotifications();
-
-
+  await FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
+      alert: true,
+      badge: true,
+      sound: false
+  );
 
   runApp(
       Navigation()

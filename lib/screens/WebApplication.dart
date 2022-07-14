@@ -33,16 +33,29 @@ class _WebApplication extends State<WebApplication> {
     super.initState();
     WidgetsFlutterBinding.ensureInitialized();
     checkLoggedIn();
-    listenNotifications();
+    flutterLocalNotificationsPlugin.initialize(initSetttings,
+        onSelectNotification: onSelectNotification);
   }
 
-  void getFirebaseToken()  {
+  Future<void> onSelectNotification(String? payload) async {
+    var notificationData = GetStorage().read("has_notif");
+    if (notificationData != null) {
+      Map<String, dynamic> data =
+          Map<String, dynamic>.from(jsonDecode(notificationData));
+      var orderId = data["order_id"].toString();
+      webView?.loadUrl(
+          urlRequest: URLRequest(
+              url: Uri.parse(
+                  "${AppConstants.APP_URL}/portal/order/$orderId?vendorId=$vendorId")));
+      GetStorage().remove("has_notif");
+    }
+  }
+
+  void getFirebaseToken() {
     FirebaseMessaging messaging = FirebaseMessaging.instance;
     messaging.getToken().then((value) => {
-      if(vendorId != null){
-        saveVendorToken(vendorId, value)
-      }
-    });
+          if (vendorId != null) {saveVendorToken(vendorId, value)}
+        });
   }
 
   void checkLoggedIn() {
@@ -52,21 +65,24 @@ class _WebApplication extends State<WebApplication> {
     }
   }
 
-
   void initStorage() async {
     final prefs = await SharedPreferences.getInstance();
     final String? auth_email = prefs.getString('auth_email');
     final String? auth_pass = prefs.getString('auth_password');
-    if(auth_email == "null" || auth_pass == "null" || auth_email == null || auth_pass == null){
+    if (auth_email == "null" ||
+        auth_pass == "null" ||
+        auth_email == null ||
+        auth_pass == null) {
       setState(() {
-        pageUrl = "${AppConstants.APP_URL}/shop/${GetStorage().read("shop_id")}/login";
+        pageUrl =
+            "${AppConstants.APP_URL}/shop/${GetStorage().read("shop_id")}/login";
       });
-    }else{
+    } else {
       setState(() {
-        pageUrl = "${AppConstants.APP_URL}/shop/${GetStorage().read("shop_id")}/login?email=$auth_email&password=$auth_pass&action=autoLogin";
+        pageUrl =
+            "${AppConstants.APP_URL}/shop/${GetStorage().read("shop_id")}/login?email=$auth_email&password=$auth_pass&action=autoLogin";
       });
     }
-
   }
 
   void writeToLocal(var email, var password) async {
@@ -123,11 +139,15 @@ class _WebApplication extends State<WebApplication> {
                 if (url.toString().contains("myshopify.com/password")) {
                   print("User is logging out-clear auth");
                   clearAuth();
-                  webView?.loadUrl(urlRequest: URLRequest(url: Uri.parse("${AppConstants.APP_URL}/shop/${GetStorage().read("shop_id")}/login")));
+                  webView?.loadUrl(
+                      urlRequest: URLRequest(
+                          url: Uri.parse(
+                              "${AppConstants.APP_URL}/shop/${GetStorage().read("shop_id")}/login")));
                   // user has logged out, so clear the local username and password
                 }
               },
               onLoadStop: (controller, url) async {
+                print(url);
                 if (url.toString().contains("portal/dashboard")) {
                   var notificationData = GetStorage().read("has_notif");
                   if (notificationData != null) {
@@ -141,9 +161,9 @@ class _WebApplication extends State<WebApplication> {
                     GetStorage().remove("has_notif");
                   }
                 }
-
-                GetStorage().write("last_endpoint", url);
-                const String functionBody = """
+                if (url.toString().contains("login")) {
+                  GetStorage().write("last_endpoint", url);
+                  const String functionBody = """
                 var p = new Promise(function (resolve, reject) {
                  let loginBtn = window.document.getElementsByClassName("login-button");
                  if(loginBtn.length){
@@ -157,13 +177,14 @@ class _WebApplication extends State<WebApplication> {
               });
               await p;
               return p;  
-          """;
-                var returnData = await controller.callAsyncJavaScript(
-                    functionBody: functionBody, arguments: {});
-                if (returnData?.value != null) {
-                  var _email = returnData?.value["email"].toString();
-                  var _password = returnData?.value["password"].toString();
-                  writeToLocal(_email, _password);
+              """;
+                  var returnData = await controller.callAsyncJavaScript(
+                      functionBody: functionBody, arguments: {});
+                  if (returnData?.value != null) {
+                    var _email = returnData?.value["email"].toString();
+                    var _password = returnData?.value["password"].toString();
+                    writeToLocal(_email, _password);
+                  }
                 }
               }),
     );
