@@ -108,62 +108,62 @@ class _WebApplication extends State<WebApplication> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      left: false,
-      top: true,
-      right: false,
-      bottom: false,
-      child: pageUrl == ""
-          ? Container(
-              color: Colors.white,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: const [
-                  CircularProgressIndicator(
-                    color: Colors.black45,
-                  ),
-                ],
-              ),
-            )
-          : InAppWebView(
-              initialUrlRequest: URLRequest(url: Uri.parse(pageUrl)),
-              initialOptions: InAppWebViewGroupOptions(
-                  crossPlatform: InAppWebViewOptions(),
-                  ios: IOSInAppWebViewOptions(),
-                  android:
-                      AndroidInAppWebViewOptions(useHybridComposition: true)),
-              onWebViewCreated: (InAppWebViewController controller) {
-                webView = controller;
-              },
-              onLoadStart: (controller, url) async {
-                if (url.toString().contains("myshopify.com/password")) {
-                  print("User is logging out-clear auth");
-                  clearAuth();
-                  webView?.loadUrl(
-                      urlRequest: URLRequest(
-                          url: Uri.parse(
-                              "${AppConstants.APP_URL}/shop/${GetStorage().read("shop_id")}/login")));
-                  // user has logged out, so clear the local username and password
-                }
-              },
-              onLoadStop: (controller, url) async {
-                print(url);
-                if (url.toString().contains("portal/dashboard")) {
-                  var notificationData = GetStorage().read("has_notif");
-                  if (notificationData != null) {
-                    Map<String, dynamic> data =
-                        Map<String, dynamic>.from(jsonDecode(notificationData));
-                    var orderId = data["order_id"].toString();
-                    webView?.loadUrl(
-                        urlRequest: URLRequest(
-                            url: Uri.parse(
-                                "${AppConstants.APP_URL}/portal/order/$orderId?vendorId=$vendorId")));
-                    GetStorage().remove("has_notif");
-                  }
-                }
-                if (url.toString().contains("login")) {
-                  GetStorage().write("last_endpoint", url);
-                  const String functionBody = """
+        left: false,
+        top: true,
+        right: false,
+        bottom: false,
+        child: pageUrl == ""
+            ? Container(
+                color: Colors.white,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    CircularProgressIndicator(
+                      color: Colors.black45,
+                    ),
+                  ],
+                ),
+              )
+            : WillPopScope(
+                child: InAppWebView(
+                    initialUrlRequest: URLRequest(url: Uri.parse(pageUrl)),
+                    initialOptions: InAppWebViewGroupOptions(
+                        crossPlatform: InAppWebViewOptions(),
+                        ios: IOSInAppWebViewOptions(),
+                        android: AndroidInAppWebViewOptions(
+                            useHybridComposition: true)),
+                    onWebViewCreated: (InAppWebViewController controller) {
+                      webView = controller;
+                    },
+                    onLoadStart: (controller, url) async {
+                      if (url.toString().contains("myshopify.com/password")) {
+                        print("User is logging out-clear auth");
+                        clearAuth();
+                        webView?.loadUrl(
+                            urlRequest: URLRequest(
+                                url: Uri.parse(
+                                    "${AppConstants.APP_URL}/shop/${GetStorage().read("shop_id")}/login")));
+                        // user has logged out, so clear the local username and password
+                      }
+                    },
+                    onLoadStop: (controller, url) async {
+                      if (url.toString().contains("portal/dashboard")) {
+                        var notificationData = GetStorage().read("has_notif");
+                        if (notificationData != null) {
+                          Map<String, dynamic> data = Map<String, dynamic>.from(
+                              jsonDecode(notificationData));
+                          var orderId = data["order_id"].toString();
+                          webView?.loadUrl(
+                              urlRequest: URLRequest(
+                                  url: Uri.parse(
+                                      "${AppConstants.APP_URL}/portal/order/$orderId?vendorId=$vendorId")));
+                          GetStorage().remove("has_notif");
+                        }
+                      }
+                      if (url.toString().contains("login")) {
+                        GetStorage().write("last_endpoint", url);
+                        const String functionBody = """
                 var p = new Promise(function (resolve, reject) {
                  let loginBtn = window.document.getElementsByClassName("login-button");
                  if(loginBtn.length){
@@ -178,19 +178,24 @@ class _WebApplication extends State<WebApplication> {
               await p;
               return p;  
               """;
-                  var returnData = await controller.callAsyncJavaScript(
-                      functionBody: functionBody, arguments: {});
-                  if (returnData?.value != null) {
-                    var _email = returnData?.value["email"].toString();
-                    var _password = returnData?.value["password"].toString();
-                    writeToLocal(_email, _password);
+                        var returnData = await controller.callAsyncJavaScript(
+                            functionBody: functionBody, arguments: {});
+                        if (returnData?.value != null) {
+                          var _email = returnData?.value["email"].toString();
+                          var _password =
+                              returnData?.value["password"].toString();
+                          writeToLocal(_email, _password);
+                        }
+                      }
+                    }),
+                onWillPop: () async {
+                  var currentUrl = await webView?.getUrl();
+                  if (currentUrl.toString().contains("portal/dashboard")) {
+                    return true;
+                  } else {
+                    await webView?.goBack();
+                    return false;
                   }
-                }
-              }),
-    );
+                }));
   }
 }
-
-/*
-*
-* */
